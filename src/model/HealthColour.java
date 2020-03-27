@@ -7,9 +7,13 @@ public class HealthColour {
         if (state == State.HEALTHY)
             return Color.CADETBLUE;
         else if (state == State.INFECTED)
-            return Color.GREEN;
+            return Color.LAWNGREEN;
+        else if (state == State.DIAGNOSED)
+            return Color.DARKRED;
         else if (state == State.DEAD)
             return Color.BLACK;
+        else if (state == State.IMMUNE)
+            return Color.LIGHTPINK;
 
         return Color.WHITE;
     }

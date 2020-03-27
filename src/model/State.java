@@ -3,5 +3,7 @@ package model;
 public enum State {
     HEALTHY,
     INFECTED,
-    DEAD
+    DIAGNOSED,
+    DEAD,
+    IMMUNE
 }

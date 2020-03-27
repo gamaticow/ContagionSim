@@ -5,10 +5,15 @@ import javafx.scene.paint.Color;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Ball {
+    private static final double CHANCE_OF_DEATH = 0.14;
+
     int x, y, dx, dy, radius;
     double true_x, true_y, speed, direction;
     Color colour;
     State state;
+
+    int timeInfected = 0;
+    boolean immune = false;
 
     public int getX() {
         return x;
@@ -16,6 +21,14 @@ public class Ball {
 
     public int getY() {
         return y;
+    }
+
+    public int getDx() {
+        return dx;
+    }
+
+    public int getDy() {
+        return dy;
     }
 
     public double getSpeed() {
@@ -32,6 +45,27 @@ public class Ball {
 
     public int getRadius() {
         return radius;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setDx(int dx) {
+        this.dx = dx;
+    }
+
+    public void setDy(int dy) {
+        this.dy = dy;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+        this.colour = HealthColour.get(this.state);
+    }
+
+    public void setDirection(double direction) {
+        this.direction = direction;
     }
 
     public Ball() {
@@ -65,6 +99,23 @@ public class Ball {
         direction = (int) (Math.random() * 360);
 
         state = State.HEALTHY;
+        colour = HealthColour.get(state);
+    }
+
+    public Ball(int max_x, int max_y, State state) {
+        radius = 10;
+
+        x = ThreadLocalRandom.current().nextInt(radius + 1, max_x - radius);
+        y = ThreadLocalRandom.current().nextInt(radius + 1, max_y - radius);
+        true_x = x;
+        true_y = y;
+
+        dx = Math.random() > 0.5? 1: -1;
+        dy = Math.random() > 0.5? 1: -1;
+        speed = 1;
+        direction = (int) (Math.random() * 360);
+
+        this.state = state;
         colour = HealthColour.get(state);
     }
 
@@ -130,6 +181,33 @@ public class Ball {
                 direction += (90 - direction) * 2;
 
             dy -= dy;
+        }
+    }
+
+    public boolean collideWith(Ball b2) {
+        return (Math.sqrt(Math.pow(x - b2.getX(), 2) + Math.pow(y - b2.getY(), 2)) <= (radius / 2) + (b2.getRadius() / 2) + 1);
+    }
+
+    public void update(int x_limit, int y_limit) {
+        if (state == State.DEAD)
+            return;
+
+        move(x_limit, y_limit);
+
+        if (state == State.INFECTED || state == State.DIAGNOSED) {
+            timeInfected++;
+            if (timeInfected == 250) {
+                setState(State.DIAGNOSED);
+            }
+
+            if (timeInfected == 400) {
+                if (Math.random() < CHANCE_OF_DEATH)
+                    setState(State.DEAD);
+            }
+
+            if (timeInfected > 500) {
+                setState(State.IMMUNE);
+            }
         }
     }
 }
