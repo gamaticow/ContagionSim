@@ -10,14 +10,18 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
+/**
+ * The main controller for the game.
+ */
 public class MainController {
 
     @FXML
     private Canvas mainCanvas;
 
+    /**
+     * Function used to run the game. The game update every 10ms. Changing this value
+     * may cause unexpected behaviours.
+     */
     public void runGame() {
         Game game = new Game((int)mainCanvas.getWidth(), (int)mainCanvas.getHeight());
         game.initialise();
@@ -31,6 +35,7 @@ public class MainController {
                 game.update(gc);
             }
         }));
+
         updateGame.setCycleCount(Timeline.INDEFINITE);
         updateGame.play();
 

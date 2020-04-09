@@ -2,7 +2,15 @@ package model;
 
 import javafx.scene.paint.Color;
 
-public class HealthColour {
+/**
+ * This class is used to return the colour corresponding to the state of an individual.
+ */
+public abstract class HealthColour {
+    /**
+     * Returns the colour corresponding to the state of an individual.
+     * @param state The state of the individual.
+     * @return The colour of the state.
+     */
     public static Color get(State state) {
         if (state == State.HEALTHY)
             return Color.CADETBLUE;

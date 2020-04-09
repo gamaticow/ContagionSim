@@ -1,14 +1,19 @@
 package model;
 
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 
+/**
+ * This class manages the game (initialising, drawing, balls collision, state update, game update).
+ * @author Quentin Cld
+ */
 public class Game {
-    ArrayList<Ball> balls, deadBalls;
-    int width, height;
-    int iter = 0;
+    private final static float CONTAINMENT_MIN_PEOPLE_PERCENTAGE = 0.25f;
+    private ArrayList<Ball> balls, deadBalls;
+    private int width, height;
+    private int iter = 0;
+    private boolean containment = false;
 
     public Game(int width, int height) {
         balls = new ArrayList<>();
@@ -17,6 +22,11 @@ public class Game {
         this.height = height;
     }
 
+    /**
+     * Checks if there is no collision between an existing individual and the one being placed.
+     * @param b The existing individual.
+     * @return True if there's no collision, false otherwise.
+     */
     private boolean canPlace(Ball b) {
         for (int j = 0; j < balls.size(); j++) {
             if (b.collideWith(balls.get(j))) {
@@ -27,6 +37,9 @@ public class Game {
         return true;
     }
 
+    /**
+     * Initialise the game (place individuals).
+     */
     public void initialise() {
         Ball ball;
         boolean canPlace = true;
@@ -45,6 +58,11 @@ public class Game {
         balls.add(ball);
     }
 
+    /**
+     * Draws the individuals on the canvas, according to their colour and coordinates.
+     * @see Ball
+     * @param gc The graphics context used to draw the individuals.
+     */
     private void drawBallsOnCanvas(GraphicsContext gc) {
         for (Ball ball: deadBalls) {
             gc.setFill(ball.getColour());
@@ -57,6 +75,12 @@ public class Game {
         }
     }
 
+    /**
+     * Makes a collision happen between two individuals. Each individual will bounce
+     * towards the initial direction of the other one.
+     * @param b1 The first individual.
+     * @param b2 The second individual.
+     */
     private void makeCollision(Ball b1, Ball b2) {
         int tmp_dx, tmp_dy;
         double tmp_direction;
@@ -74,6 +98,11 @@ public class Game {
         b2.setDirection(tmp_direction);
     }
 
+    /**
+     * Updates the state of the individuals when a collision happens.
+     * @param b1 The first individual.
+     * @param b2 The second individual.
+     */
     private void checkHealth(Ball b1, Ball b2) {
         if (b1.getState() == State.INFECTED && b2.getState() == State.INFECTED)
             return;
@@ -90,6 +119,10 @@ public class Game {
 
     }
 
+    /**
+     * Checks if a collision occurred between some individuals. An ArrayList is used in order
+     * to reduce the number of collision checking.
+     */
     private void checkForCollision() {
         ArrayList<Integer> AlreadyDoneIndex = new ArrayList<>();
 
@@ -108,8 +141,14 @@ public class Game {
         }
     }
 
+    /**
+     * Updates the game at each step.
+     * @see Ball#update(int, int)
+     * @param gc The graphics context used to draw the individuals.
+     */
     public void update(GraphicsContext gc) {
         ArrayList<Integer> toRemove = new ArrayList<>();
+        int diagnosedCases = 0;
 
         for (int i = 0; i < balls.size(); i++) {
             balls.get(i).update(width, height);
@@ -117,11 +156,25 @@ public class Game {
             if (balls.get(i).getState() == State.DEAD) {
                 toRemove.add(i);
             }
+
+            if (balls.get(i).getState() == State.DIAGNOSED ||
+                balls.get(i).getState() == State.IMMUNE ||
+                balls.get(i).getState() == State.DEAD) {
+
+                diagnosedCases++;
+            }
         }
 
         for (int idx: toRemove) {
             deadBalls.add(balls.get(idx));
             balls.remove(idx);
+        }
+
+        if (!containment && (float) diagnosedCases / (float)balls.size() > CONTAINMENT_MIN_PEOPLE_PERCENTAGE) {
+            containment = true;
+            for (Ball ball: balls) {
+                ball.setSpeed(ball.getSpeed() / 2);
+            }
         }
 
 

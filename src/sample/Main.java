@@ -7,6 +7,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+/**
+ * The entry point of the program.
+ * @author Quentin Cld
+ */
 public class Main extends Application {
 
     @Override
