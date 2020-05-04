@@ -151,7 +151,7 @@ public class Game {
         int diagnosedCases = 0;
 
         for (int i = 0; i < balls.size(); i++) {
-            balls.get(i).update(width, height);
+            balls.get(i).update(width, height, containment);
 
             if (balls.get(i).getState() == State.DEAD) {
                 toRemove.add(i);
@@ -170,13 +170,8 @@ public class Game {
             balls.remove(idx);
         }
 
-        if (!containment && (float) diagnosedCases / (float)balls.size() > CONTAINMENT_MIN_PEOPLE_PERCENTAGE) {
+        if (!containment && (float) diagnosedCases / (float)balls.size() > CONTAINMENT_MIN_PEOPLE_PERCENTAGE)
             containment = true;
-            for (Ball ball: balls) {
-                ball.setSpeed(ball.getSpeed() / 2);
-            }
-        }
-
 
         checkForCollision();
 

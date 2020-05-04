@@ -226,7 +226,7 @@ public class Ball {
      * @param y_limit The height of the canvas (representing the space available
      *                to the individuals).
      */
-    public void update(int x_limit, int y_limit) {
+    public void update(int x_limit, int y_limit, boolean containment) {
         if (state == State.DEAD)
             return;
 
@@ -247,5 +247,16 @@ public class Ball {
                 setState(State.IMMUNE);
             }
         }
+
+        if (containment && speed != 0.1 && (state == State.DIAGNOSED))
+            speed = 0.1;
+
+        else if (containment && speed != 0.5 && state == State.IMMUNE)
+            speed = 0.5;
+
+        else if (containment && speed > 0.5 && !(state == State.DEAD))
+            speed = 0.5;
+
+
     }
 }
