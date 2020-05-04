@@ -4,6 +4,7 @@ import javafx.scene.paint.Color;
 
 /**
  * This class is used to return the colour corresponding to the state of an individual.
+ * @author Quentin Cld
  */
 public abstract class HealthColour {
     /**

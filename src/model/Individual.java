@@ -8,14 +8,72 @@ import java.util.concurrent.ThreadLocalRandom;
  * This class represents an individual member of the population.
  * @author Quentin Cld
  */
-public class Ball {
+public class Individual {
+    /**
+     * The chance of death for an individual that is infected with disease
+     */
     private static final double CHANCE_OF_DEATH = 0.06;
 
-    int x, y, dx, dy, radius;
-    double true_x, true_y, speed, direction;
+    /**
+     * The x position of the individual
+     */
+    int x;
+
+    /**
+     * The y position of the individual
+     */
+    int y;
+
+    /**
+     * The direction in x of the individual
+     */
+    int dx;
+
+    /**
+     * The direction in y of the individual
+     */
+    int dy;
+
+    /**
+     * The size of the individual
+     */
+    int radius;
+
+    /**
+     * The x position of the individual as a float
+     */
+    double true_x;
+
+    /**
+     * The y position of the individual as a float
+     */
+    double true_y;
+
+    /**
+     * The speed of the individual
+     */
+    double speed;
+
+    /**
+     * The direction of the individual, as an angle (0 - 360)
+     */
+    double direction;
+
+    /**
+     * The colour of the individual
+     * @see HealthColour
+     */
     Color colour;
+
+    /**
+     * The state of the individual
+     * @see State
+     */
     State state;
 
+    /**
+     * The number of iteration the individual has been infected
+     */
     int timeInfected = 0;
 
     public int getX() {
@@ -75,7 +133,7 @@ public class Ball {
         this.direction = direction;
     }
 
-    public Ball() {
+    public Individual() {
         radius = 10;
 
         x = 50;
@@ -92,7 +150,7 @@ public class Ball {
         colour = HealthColour.get(state);
     }
 
-    public Ball(int max_x, int max_y) {
+    public Individual(int max_x, int max_y) {
         radius = 10;
 
         x = ThreadLocalRandom.current().nextInt(radius + 1, max_x - radius);
@@ -109,7 +167,7 @@ public class Ball {
         colour = HealthColour.get(state);
     }
 
-    public Ball(int max_x, int max_y, State state) {
+    public Individual(int max_x, int max_y, State state) {
         radius = 10;
 
         x = ThreadLocalRandom.current().nextInt(radius + 1, max_x - radius);
@@ -126,7 +184,7 @@ public class Ball {
         colour = HealthColour.get(state);
     }
 
-    public Ball(int max_x, int max_y, float speed) {
+    public Individual(int max_x, int max_y, float speed) {
         radius = 10;
 
         x = ThreadLocalRandom.current().nextInt(radius + 1, max_x - radius);
@@ -146,7 +204,7 @@ public class Ball {
     /**
      * This function is called each step to compute the direction and the distance traveled
      * by an individual. It also checks for direction change.
-     * @see Ball#changeDirection(int, int) 
+     * @see #changeDirection(int, int)
      * @param x_limit The width of the canvas (representing the space available
      *                to the individuals).
      * @param y_limit The height of the canvas (representing the space available
@@ -210,17 +268,17 @@ public class Ball {
 
     /**
      * Checks for a collision with another individual. The +1 is here to solve an edge case.
-     * @param b2 The other individual.
+     * @param i2 The other individual.
      * @return True if there is a collision, false otherwise.
      */
-    public boolean collideWith(Ball b2) {
-        return (Math.sqrt(Math.pow(x - b2.getX(), 2) + Math.pow(y - b2.getY(), 2)) <= (radius / 2.0f) + (b2.getRadius() / 2.0f) + 1);
+    public boolean collideWith(Individual i2) {
+        return (Math.sqrt(Math.pow(x - i2.getX(), 2) + Math.pow(y - i2.getY(), 2)) <= (radius / 2.0f) + (i2.getRadius() / 2.0f) + 1);
     }
 
     /**
      * This function is called each step, for each individual. It takes care of checking the state of the individual,
      * moving it and changing its state.
-     * @see Ball#move(int, int)
+     * @see #move(int, int)
      * @param x_limit The width of the canvas (representing the space available
      *                to the individuals).
      * @param y_limit The height of the canvas (representing the space available

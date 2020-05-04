@@ -2,6 +2,7 @@ package model;
 
 /**
  * This enumeration is used to describe the current state of an individual.
+ * @author Quentin Cld
  */
 public enum State {
     HEALTHY,

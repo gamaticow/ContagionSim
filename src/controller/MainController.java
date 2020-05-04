@@ -12,9 +12,13 @@ import javafx.scene.canvas.GraphicsContext;
 
 /**
  * The main controller for the game.
+ * @author Quentin Cld
  */
 public class MainController {
 
+    /**
+     * The canvas used to draw the game
+     */
     @FXML
     private Canvas mainCanvas;
 
