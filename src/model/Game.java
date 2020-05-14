@@ -194,7 +194,7 @@ public class Game {
                 diagnosedCases++;
             }
         }
-
+        Collections.sort(toRemove,Collections.reverseOrder());//si on essay de suprimer 1 avant 2 alors 2 deviendre 1 et on aura un IndexOutOfBoundExeption
         for (int idx: toRemove) {
             deadIndividuals.add(individuals.get(idx));
             individuals.remove(idx);
