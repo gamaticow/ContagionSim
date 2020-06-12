@@ -1,8 +1,9 @@
-package model;
+package model.game;
 
 import javafx.scene.canvas.GraphicsContext;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * This class manages the game (initialising, drawing, balls collision, state update, game update).
@@ -13,17 +14,27 @@ public class Game {
     /**
      * Le pourncetage minimal de personnes diagnostiquées positives pour déclencher le confinement
      */
-    private final static float CONTAINMENT_MIN_PEOPLE_PERCENTAGE = 0.25f;
+    public static float lockdownMinPeoplePercentage = 0.25f;
+
+    /**
+     * Nombre d'individu dans la simulation
+     */
+    public static int maxPeople = 100;
+
+    /**
+     * Percentage of contagion of the virus
+     */
+    public static float contagion = 0.5f;
 
     /**
      * Liste des individus
      */
-    private ArrayList<Individual> individuals;
+    public ArrayList<Individual> individuals;
 
     /**
      * Liste des individus morts
      */
-    private ArrayList<Individual> deadIndividuals;
+    public ArrayList<Individual> deadIndividuals;
 
     /**
      * Largeur du canvas
@@ -73,17 +84,17 @@ public class Game {
     public void initialise() {
         Individual individual;
         boolean canPlace = true;
-        for (int i = 0; i < 99; i++) {
-            individual = new Individual(width, height, State.HEALTHY);
+        for (int i = 0; i < maxPeople-1; i++) {
+            individual = new Individual(IndividualType.getRandomType(), width, height, State.HEALTHY);
             while (!canPlace(individual))
-                individual = new Individual(width, height, State.HEALTHY);
+                individual = new Individual(IndividualType.getRandomType(), width, height, State.HEALTHY);
 
             individuals.add(individual);
         }
 
-        individual = new Individual(width, height, State.INFECTED);
+        individual = new Individual(IndividualType.getRandomType(), width, height, State.INFECTED);
         while (!canPlace(individual)) {
-            individual = new Individual(width, height, State.INFECTED);
+            individual = new Individual(IndividualType.getRandomType(), width, height, State.INFECTED);
         }
         individuals.add(individual);
     }
@@ -140,11 +151,13 @@ public class Game {
             return;
 
         if ((i1.getState() == State.INFECTED || i1.getState() == State.DIAGNOSED) && i2.getState() == State.HEALTHY) {
-            i2.setState(State.INFECTED);
+            if(Math.random() < contagion)
+                i2.setState(State.INFECTED);
         }
 
         if ((i2.getState() == State.INFECTED || i2.getState() == State.DIAGNOSED) && i1.getState() == State.HEALTHY) {
-            i1.setState(State.INFECTED);
+            if(Math.random() < contagion)
+                i1.setState(State.INFECTED);
         }
 
     }
@@ -195,12 +208,14 @@ public class Game {
             }
         }
 
+        toRemove.sort(Collections.reverseOrder());
+
         for (int idx: toRemove) {
             deadIndividuals.add(individuals.get(idx));
             individuals.remove(idx);
         }
 
-        if (!lockdown && (float) diagnosedCases / (float) individuals.size() > CONTAINMENT_MIN_PEOPLE_PERCENTAGE)
+        if (!lockdown && (float) diagnosedCases / (float) individuals.size() > lockdownMinPeoplePercentage)
             lockdown = true;
 
         checkForCollision();
@@ -208,5 +223,9 @@ public class Game {
         gc.clearRect(0, 0, width, height);
         drawBallsOnCanvas(gc);
         iter++;
+    }
+
+    public int getIteration(){
+        return iter;
     }
 }

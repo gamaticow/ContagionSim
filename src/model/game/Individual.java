@@ -1,4 +1,4 @@
-package model;
+package model.game;
 
 import javafx.scene.paint.Color;
 
@@ -12,7 +12,22 @@ public class Individual {
     /**
      * The chance of death for an individual that is infected with disease
      */
-    private static final double CHANCE_OF_DEATH = 0.06;
+    public static float chanceToDie = 0.06f;
+
+    /**
+     * The default speed of an individual
+     */
+    public static int defaultSpeed = 1;
+
+    /**
+     * The default size of an individual
+     */
+    public static int defaultRadius = 10;
+
+    /**
+     * The time to diagnostic a individual
+     */
+    public static int timeToDiagnostic = 250;
 
     /**
      * The x position of the individual
@@ -61,7 +76,7 @@ public class Individual {
 
     /**
      * The colour of the individual
-     * @see HealthColour
+     * @see State#getColor()
      */
     Color colour;
 
@@ -75,6 +90,11 @@ public class Individual {
      * The number of iteration the individual has been infected
      */
     int timeInfected = 0;
+
+    /**
+     * The type of the individual.
+     */
+    IndividualType type;
 
     public int getX() {
         return x;
@@ -120,21 +140,17 @@ public class Individual {
         this.dy = dy;
     }
 
-    public void setSpeed(double speed) {
-        this.speed = speed;
-    }
-
     public void setState(State state) {
         this.state = state;
-        this.colour = HealthColour.get(this.state);
+        this.colour = this.state.getColor();
     }
 
     public void setDirection(double direction) {
         this.direction = direction;
     }
 
-    public Individual() {
-        radius = 10;
+    public Individual(IndividualType type) {
+        radius = defaultRadius;
 
         x = 50;
         y = 50;
@@ -143,15 +159,17 @@ public class Individual {
 
         dx = Math.random() > 0.5? 1: -1;
         dy = Math.random() > 0.5? 1: -1;
-        speed = 1;
+
+        this.type = type;
+        speed = getSpeed(defaultSpeed);
         direction = (int) (Math.random() * 360);
 
         state = State.HEALTHY;
-        colour = HealthColour.get(state);
+        colour = state.getColor();
     }
 
-    public Individual(int max_x, int max_y) {
-        radius = 10;
+    public Individual(IndividualType type, int max_x, int max_y) {
+        radius = defaultRadius;
 
         x = ThreadLocalRandom.current().nextInt(radius + 1, max_x - radius);
         y = ThreadLocalRandom.current().nextInt(radius + 1, max_y - radius);
@@ -160,15 +178,17 @@ public class Individual {
 
         dx = Math.random() > 0.5? 1: -1;
         dy = Math.random() > 0.5? 1: -1;
-        speed = 1;
+
+        this.type = type;
+        speed = getSpeed(defaultSpeed);
         direction = (int) (Math.random() * 360);
 
         state = State.HEALTHY;
-        colour = HealthColour.get(state);
+        colour = state.getColor();
     }
 
-    public Individual(int max_x, int max_y, State state) {
-        radius = 10;
+    public Individual(IndividualType type, int max_x, int max_y, State state) {
+        radius = defaultRadius;
 
         x = ThreadLocalRandom.current().nextInt(radius + 1, max_x - radius);
         y = ThreadLocalRandom.current().nextInt(radius + 1, max_y - radius);
@@ -177,15 +197,16 @@ public class Individual {
 
         dx = Math.random() > 0.5? 1: -1;
         dy = Math.random() > 0.5? 1: -1;
-        speed = 1;
+        this.type = type;
+        speed = getSpeed(defaultSpeed);
         direction = (int) (Math.random() * 360);
 
         this.state = state;
-        colour = HealthColour.get(state);
+        colour = state.getColor();
     }
 
-    public Individual(int max_x, int max_y, float speed) {
-        radius = 10;
+    public Individual(IndividualType type, int max_x, int max_y, float speed) {
+        radius = defaultRadius;
 
         x = ThreadLocalRandom.current().nextInt(radius + 1, max_x - radius);
         y = ThreadLocalRandom.current().nextInt(radius + 1, max_y - radius);
@@ -194,11 +215,12 @@ public class Individual {
 
         dx = Math.random() > 0.5? 1: -1;
         dy = Math.random() > 0.5? 1: -1;
-        this.speed = speed;
+        this.type = type;
+        this.speed = getSpeed(speed);
         direction = (int) (Math.random() * 360);;
 
         state = State.HEALTHY;
-        colour = HealthColour.get(state);
+        colour = state.getColor();
     }
 
     /**
@@ -292,29 +314,40 @@ public class Individual {
 
         if (state == State.INFECTED || state == State.DIAGNOSED) {
             timeInfected++;
-            if (timeInfected == 250) {
+            if (timeInfected == timeToDiagnostic) {
                 setState(State.DIAGNOSED);
             }
 
-            if (timeInfected == 400) {
-                if (Math.random() < CHANCE_OF_DEATH)
+            if (timeInfected == timeToDiagnostic + 150) {
+                if (Math.random() < chanceToDie*type.getMortality())
                     setState(State.DEAD);
             }
 
-            if (timeInfected > 500) {
+            if (timeInfected > timeToDiagnostic + 250) {
                 setState(State.IMMUNE);
             }
         }
 
         if (containment && speed != 0.1 && (state == State.DIAGNOSED))
-            speed = 0.1;
+            speed = getSpeed(0.1);
 
         else if (containment && speed != 0.5 && state == State.IMMUNE)
-            speed = 0.5;
+            speed = getSpeed(0.5);
 
         else if (containment && speed > 0.5 && !(state == State.DEAD))
-            speed = 0.5;
+            speed = getSpeed(0.5);
 
 
+    }
+
+
+    /**
+     * Randomize the speed and add the IndividualType speed modifier.
+     * 70% to 130% of the speed.
+     * @param of The speed to randomize.
+     * @return The speed to use.
+     */
+    private double getSpeed(double of){
+        return (of*(Math.random()*0.6+0.7))*type.getSpeed();
     }
 }

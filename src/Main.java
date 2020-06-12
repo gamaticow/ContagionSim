@@ -13,15 +13,10 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("view/game.fxml"));
-        Parent root = loader.load();
-        primaryStage.setTitle("Hello World");
+        Parent root = FXMLLoader.load(getClass().getResource("view/menu.fxml"));
+        primaryStage.setTitle("Contagion Sim");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-
-        MainController gController = loader.getController();
-        gController.runGame();
     }
 
 

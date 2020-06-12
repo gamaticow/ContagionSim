@@ -1,0 +1,11 @@
+.default-color0.chart-series-line{-fx-stroke: cadetblue;}
+.default-color1.chart-series-line{-fx-stroke: lawngreen;}
+.default-color2.chart-series-line{-fx-stroke: darkred;}
+.default-color3.chart-series-line {-fx-stroke: black;}
+.default-color4.chart-series-line{-fx-stroke: lightpink}
+
+.default-color0.chart-line-symbol{-fx-background-color: cadetblue;}
+.default-color1.chart-line-symbol{-fx-background-color: lawngreen;}
+.default-color2.chart-line-symbol{-fx-background-color: darkred;}
+.default-color3.chart-line-symbol {-fx-background-color: black;}
+.default-color4.chart-line-symbol{-fx-background-color: lightpink;}
